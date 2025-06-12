@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rick y Morty/Harry Potther</title>
+    <style>
+        :root {
+            --color-primario: #2A1A5E;
+            --color-secundario: #F0E68C;
+            --color-terciario: #97CE4C;
+            --color-cuarto: #00B0C4;
+            --color-text-light: #F8F8F8;
+            --color-text-dark: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-primario);
+            color: var(--color-text-light);
+            font-family: 'Verdana', sans-serif;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--color-cuarto);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 3px solid var(--color-secundario);
+        }
+
+        header img {
+            width: 70px;
+            height: auto;
+            object-fit: contain;
+            margin-right: 1rem;
+        }
+
+        .search {
+            background-color: var(--color-primario);
+            border: 2px solid var(--color-terciario);
+            border-radius: 25px;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.95rem;
+            padding: 0.6rem 1.2rem;
+            color: var(--color-terciario);
+            width: 220px;
+            transition: all 0.3s ease;
+        }
+
+        .search::placeholder {
+            color: var(--color-terciario);
+            opacity: 0.7;
+        }
+
+        .search:hover {
+            border-color: var(--color-secundario);
+        }
+
+        .search:focus {
+            outline: none;
+            background-color: var(--color-terciario);
+            color: var(--color-text-dark);
+            box-shadow: 0 0 8px rgba(240, 230, 140, 0.5);
+        }
+
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        .personaje {
+            background-color: var(--color-secundario);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            position: relative;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid var(--color-terciario);
+        }
+
+        .personaje:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 176, 196, 0.6);
+        }
+
+        .personaje img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            object-position: top;
+            background-color: #555;
+            border-bottom: 2px solid var(--color-terciario);
+        }
+
+        .personaje-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem 1.2rem;
+            background-color: var(--color-text-light);
+            color: var(--color-text-dark);
+        }
+
+        .personaje-info h1 {
+            font-size: 1.4rem;
+            color: var(--color-primario);
+            margin-bottom: 0.2rem;
+        }
+
+        .personaje-info h3 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: var(--color-cuarto);
+        }
+
+        .personaje-info .tag {
+            font-size: 0.9rem;
+            color: var(--color-text-dark);
+            background-color: var(--color-terciario);
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            align-self: flex-start;
+            text-transform: capitalize;
+        }
+
+        .descripcion {
+            background-color: var(--color-primario);
+            bottom: 0;
+            left: 0;
+            padding: 1rem;
+            position: absolute;
+            right: 0;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+            max-height: 100%;
+            overflow-y: auto;
+            color: var(--color-text-light);
+        }
+
+        .personaje:hover .descripcion {
+            transform: translateY(0);
+        }
+
+        .descripcion h3 {
+            margin-bottom: 0.6rem;
+            font-size: 1.1rem;
+            color: var(--color-secundario);
+        }
+
+        .descripcion p {
+            margin-bottom: 0.4rem;
+            font-size: 0.95rem;
+            color: var(--color-text-light);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            header img {
+                margin-bottom: 0.8rem;
+            }
+            .search {
+                width: 100%;
+                max-width: 250px;
+                font-size: 1rem;
+            }
+            .personaje {
+                width: 90%;
+                max-width: 350px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .personaje {
+                width: 100%;
+            }
+        }
+         nav {
+        background: linear-gradient(to right, #ffb3ba, #ffdfba, #ffffba, #baffc9, #bae1ff);
+        padding: 10px;
+        text-align: center;
+        border-bottom: 4px solid #fff;
+    }
+    </style>
+    
+</head>
+
+<body>
+    <header>
+        <form id="form">
+            <img src="logo.png" alt="Rick y Morty/Harry Potther Logo">
+            <input type="text" id="search" class="search" placeholder="Busca un personaje...">
+        </form>
+    </header>
+    <main id="main"></main>
+    <script>
+        const API_URL_HP = 'https://hp-api.onrender.com/api/characters';
+        const API_URL_RM = 'https://rickandmortyapi.com/api/character';
+
+        const main = document.getElementById('main');
+        const form = document.getElementById('form');
+        const search = document.getElementById('search');
+        
+        let allCharacters = [];
+        let fetchedHP = false;
+        let fetchedRM = false;
+
+        getCharacters(API_URL_HP, 'hp');
+        getCharacters(API_URL_RM, 'rm');
+
+        async function getCharacters(url, source) {
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (source === 'hp' && Array.isArray(data)) {
+                    allCharacters = allCharacters.concat(data.map(char => ({ ...char, source: 'hp' })));
+                    fetchedHP = true;
+                } else if (source === 'rm' && Array.isArray(data.results)) {
+                    allCharacters = allCharacters.concat(data.results.map(char => ({ ...char, source: 'rm' })));
+                    fetchedRM = true;
+                }
+
+                if (fetchedHP && fetchedRM) {
+                    showCharacters(allCharacters);
+                }
+            } catch (error) {
+                console.error(`Error al cargar datos desde ${url}:`, error);
+                if (source === 'hp') fetchedHP = true;
+                if (source === 'rm') fetchedRM = true;
+                if (fetchedHP && fetchedRM) {
+                    main.innerHTML = '<p style="color: var(--color-text-light); font-size: 1.2rem; text-align: center;">No se pudo cargar la información de algunos personajes.</p>';
+                }
+            }
+        }
+        
+        function showCharacters(characters) {
+            main.innerHTML = '';
+            if (!characters.length) {
+                main.innerHTML = '<p style="color: var(--color-text-light); font-size: 1.2rem; text-align: center;">No hay personajes para mostrar.</p>';
+                return;
+            }
+        
+            characters.forEach((char) => {
+                const charElement = document.createElement('div');
+                charElement.classList.add('personaje');
+        
+                let name, image, info1, info2, descriptionText;
+        
+                if (char.source === 'hp') {
+                    name = char.name;
+                    image = char.image || 'https://via.placeholder.com/280x300?text=HP+No+Image';
+                    info1 = char.species || 'Especie: Desconocida';
+                    info2 = char.house ? `Casa: ${char.house}` : 'Casa: Desconocida';
+                    descriptionText = `
+                        <p><strong>Actor:</strong> ${char.actor || 'Desconocido'}</p>
+                        <p><strong>Patronus:</strong> ${char.patronus || 'Desconocido'}</p>
+                        <p><strong>Ancestros:</strong> ${char.ancestry || 'Desconocido'}</p>
+                    `;
+                } else {
+                    name = char.name;
+                    image = char.image || 'https://via.placeholder.com/280x300?text=RM+No+Image';
+                    info1 = char.status ? `Estado: ${char.status}` : 'Estado: Desconocido';
+                    info2 = char.species ? `Especie: ${char.species}` : 'Especie: Desconocida';
+                    descriptionText = `
+                        <p><strong>Género:</strong> ${char.gender || 'Desconocido'}</p>
+                        <p><strong>Origen:</strong> ${char.origin ? char.origin.name : 'Desconocido'}</p>
+                        <p><strong>Locación:</strong> ${char.location ? char.location.name : 'Desconocido'}</p>
+                    `;
+                }
+        
+                charElement.innerHTML = `
+                    <img src="${image}" alt="${name}" onerror="this.src='https://via.placeholder.com/280x300?text=Sin+Imagen'">
+                    <div class="personaje-info">
+                        <h1>${name}</h1>
+                        <h3>${info1}</h3>
+                        <span class="tag">${info2}</span>
+                    </div>
+                    <div class="descripcion">
+                        <h3>Detalles:</h3>
+                        ${descriptionText}
+                    </div>
+                `;
+                main.appendChild(charElement);
+            });
+        }
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const searchTerm = search.value.trim().toLowerCase();
+            if (searchTerm) {
+                const filtered = allCharacters.filter(c =>
+                    c.name && c.name.toLowerCase().includes(searchTerm)
+                );
+                showCharacters(filtered);
+                search.value = '';
+            } else {
+                showCharacters(allCharacters);
+            }
+        });
+    </script>
+</body>
+</html>

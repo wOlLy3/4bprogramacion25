@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <style>
+            body {
+                background-color: #cb91c1;
+            }
+            .pokeImg {
+                width: 250px;
+                height: 250px;
+                position: absolute;
+                top: 50px;
+                left: 1000px;
+                mix-blend-mode: multiply;
+            }
+            .placeholder {
+                width: 150px;
+                height: 50px;
+                position: absolute;
+                top: 50px;
+                left: 750px;
+                font-family: Verdana, Geneva, Tahoma, sans-serif;
+                font-size: 20px;
+                border-radius: 10px;
+                background-color: #cb91ac;
+                text-align: center;
+                text-shadow: 1px 1px 1px rgb(255, 255, 255);
+            }
+            button {
+                width: 50px;
+                height: 50px;
+                background-color: #612d68;
+                border-color: rgb(255, 255, 255);
+                border-radius: 50px;
+                position: absolute;
+                top: 50px;
+                left: 650px;
+            }
+            .pokeImg1 {
+                position: absolute;
+                font-family: 'Open Sans', sans-serif;
+                font-weight: bold;
+                color: #000000;
+            }
+            .grafica {
+                position: absolute;
+                top: 170px;
+                left: 300px;
+                width: 400px;
+                height: 300px;
+            }
+        </style> 
+
+        <img src="background.png" width="1000px">
+        <input type="text" placeholder="mew" id="pokeName" class="placeholder">
+        <img src="pokebola.png" alt="pokebola" id="pokeImg" class="pokeImg">
+
+        <div id="pokemonNameDisplay" class="pokeImg1" style="top: 170px; left: 50px;">Nombre: </div>
+        <div id="pokeHe" class="pokeImg1" style="left: 50px; top: 210px;">Altura: </div>
+        <div id="pokeWe" class="pokeImg1" style="left: 50px; top: 250px;">Peso: </div>
+        <div id="poketype" class="pokeImg1" style="left: 50px; top: 290px;">Tipo: </div>
+        <div id="pokeitem" class="pokeImg1" style="left: 50px; top: 330px;">Habilidad:</div>
+        <div id="pokemove1" class="pokeImg1" style="left: 50px; top: 370px;">Movimiento 1: </div>
+        <div id="pokemove2" class="pokeImg1" style="left: 50px; top: 410px;">Movimiento 2: </div>
+        <div id="pokemove3" class="pokeImg1" style="left: 50px; top: 450px;">Movimiento 3: </div>
+        <div id="pokemove4" class="pokeImg1" style="left: 50px; top: 490px;">Movimiento 4: </div>
+
+        <button onclick="fetchPokemon()" class="button"></button>
+        <div class="grafica">
+            <canvas id="miCanvas"></canvas>
+        </div>
+        <script>
+            const fetchPokemon = () => {
+                const pokeNameInput = document.getElementById("pokeName");
+                let pokeName = pokeNameInput.value;
+                pokeName = pokeName.toLowerCase();
+                const url = `https://pokeapi.co/api/v2/pokemon/${pokeName}`;
+
+                fetch(url).then((res) => {
+                    if (res.status !== 200) {
+                        console.log(res);
+                        document.getElementById('pokemonNameDisplay').innerHTML = 'Nombre: No encontrado';
+                        document.getElementById('pokeHe').innerHTML = 'Altura:';
+                        document.getElementById('pokeWe').innerHTML = 'Peso:';
+                        document.getElementById('poketype').innerHTML = 'Tipo:';
+                        document.getElementById('pokeitem').innerHTML = 'Habilidad:';
+                        document.getElementById('pokemove1').innerHTML = 'Movimiento 1:';
+                        document.getElementById('pokemove2').innerHTML = 'Movimiento 2:';
+                        document.getElementById('pokemove3').innerHTML = 'Movimiento 3:';
+                        document.getElementById('pokemove4').innerHTML = 'Movimiento 4:';
+                        document.getElementById("pokeImg").src = "pokebola.png";
+                        if (window.miCanva) {
+                            window.miCanva.destroy();
+                        }
+                        return null;
+                    }
+                    return res.json();
+                }).then((data) => {
+                    if (data) {
+                        console.log(data);
+                        let pokeImgElement = document.getElementById("pokeImg");
+                        pokeImgElement.src = data.sprites.front_default;
+
+                        document.getElementById('pokemonNameDisplay').innerHTML = `Nombre: ${data.forms[0].name}`;
+                        document.getElementById('pokeHe').innerHTML = `Altura: ${data.height}`;
+                        document.getElementById('pokeWe').innerHTML = `Peso: ${data.weight}`;
+                        document.getElementById('poketype').innerHTML = `Tipo: ${data.types[0].type.name}`;
+                        document.getElementById('pokeitem').innerHTML = `Habilidad: ${data.abilities[0].ability.name}`;
+                        
+                        document.getElementById('pokemove1').innerHTML = `Movimiento 1: ${data.moves[0] ? data.moves[0].move.name : 'N/A'}`;
+                        document.getElementById('pokemove2').innerHTML = `Movimiento 2: ${data.moves[1] ? data.moves[1].move.name : 'N/A'}`;
+                        document.getElementById('pokemove3').innerHTML = `Movimiento 3: ${data.moves[2] ? data.moves[2].move.name : 'N/A'}`;
+                        document.getElementById('pokemove4').innerHTML = `Movimiento 4: ${data.moves[3] ? data.moves[3].move.name : 'N/A'}`;
+                        
+                        const miCanvas = document.getElementById("miCanvas").getContext("2d");
+                        if (window.miCanva !== undefined) {
+                            window.miCanva.destroy();
+                        }
+                        window.miCanva = new Chart(miCanvas, {
+                            type: "bar",
+                            data: {
+                                labels: ["HP", "Attack", "Defense", "Special-A", "Special-D", "Speed"],
+                                datasets: [
+                                    {
+                                        label: `${data.forms[0].name}`,
+                                        backgroundColor: 'rgba(54,162,235,1)',
+                                        data: [
+                                            data.stats[0].base_stat,
+                                            data.stats[1].base_stat,
+                                            data.stats[2].base_stat,
+                                            data.stats[3].base_stat,
+                                            data.stats[4].base_stat,
+                                            data.stats[5].base_stat
+                                        ],
+                                        borderColor: [
+                                            'rgba(255, 99, 132, 1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 206, 86, 1)',
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(153, 102, 255, 1)',
+                                            'rgba(255, 159, 64, 1)'
+                                        ],
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.5)',
+                                            'rgba(54, 162, 235, 0.5)',
+                                            'rgba(255, 206, 86, 0.5)',
+                                            'rgba(75, 192, 192, 0.5)',
+                                            'rgba(153, 102, 255, 0.5)',
+                                            'rgba(255, 159, 64, 0.5)'
+                                        ],
+                                        borderWidth: 1,
+                                    }
+                                ]
+                            },
+                            options: {
+                                scales: {
+                                    x: {
+                                        ticks: {
+                                            maxRotation: 90,
+                                            minRotation: 90,
+                                            color: 'purple',
+                                            font: { size: 15 },
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }).catch((error) => {
+                    console.error('Error fetching Pokémon:', error);
+                    document.getElementById('pokemonNameDisplay').innerHTML = 'Nombre: Error de conexión';
+                    document.getElementById('pokeHe').innerHTML = 'Altura:';
+                    document.getElementById('pokeWe').innerHTML = 'Peso:';
+                    document.getElementById('poketype').innerHTML = 'Tipo:';
+                    document.getElementById('pokeitem').innerHTML = 'Habilidad:';
+                    document.getElementById('pokemove1').innerHTML = 'Movimiento 1:';
+                    document.getElementById('pokemove2').innerHTML = 'Movimiento 2:';
+                    document.getElementById('pokemove3').innerHTML = 'Movimiento 3:';
+                    document.getElementById('pokemove4').innerHTML = 'Movimiento 4:';
+                    document.getElementById("pokeImg").src = "pokebola.png";
+                    if (window.miCanva) {
+                        window.miCanva.destroy();
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
